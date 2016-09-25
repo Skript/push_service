@@ -40,7 +40,7 @@ init({AppId, Debug}) ->
 
   Self = self(),
   ConnectionErrorFun = fun(Conn) ->
-    error_logger:info_msg("APNS disconnected. Connection: ~p~n", [Conn]),
+    error_logger:error_msg("APNS disconnected for AppId ~p (debug: ~p). Connection: ~p~n", [AppId, Debug, Conn]),
     stop
   end,
 
