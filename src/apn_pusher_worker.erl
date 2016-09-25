@@ -1,6 +1,7 @@
 -module(apn_pusher_worker).
 -behaviour(gen_server).
 -behaviour(poolboy_worker).
+-behaviour(pusher_worker).
 
 -include("push_service.hrl").
 -include_lib("apns/include/apns.hrl").
@@ -10,6 +11,7 @@
          code_change/3]).
 
 -export([error_fun/2, feedback_fun/2]).
+-export([should_send_to_all/0]).
 
 -record(state, {conn}).
 
@@ -120,7 +122,9 @@ get_message(
     extra = Extra
   },
   Token) when is_list(Token) ->
-  ContentAvailable = proplists:get_value(content_available, Extra),
+  ContentAvailable = if is_list(Extra) -> proplists:get_value(content_available, Extra);
+    true -> undefined
+  end,
   Msg = #apns_msg{
     device_token = [Char || Char <- Token, Char =/= $  ],
     alert = case Text of undefined -> default(text); _ -> Text end,
@@ -140,3 +144,5 @@ push_host(false) -> "gateway.push.apple.com".
 
 feedback_host(true) -> "feedback.sandbox.push.apple.com";
 feedback_host(false) -> "feedback.push.apple.com".
+
+should_send_to_all() -> false.

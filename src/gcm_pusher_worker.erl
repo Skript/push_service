@@ -1,12 +1,14 @@
 -module(gcm_pusher_worker).
 -behaviour(gen_server).
 -behaviour(poolboy_worker).
+-behaviour(pusher_worker).
 
 -include("push_service.hrl").
 -export([start_link/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
          code_change/3]).
 
+-export([should_send_to_all/0]).
 -export([
   error_fun/2,
   update_token_fun/3,
@@ -94,3 +96,5 @@ handle_info(_,State) -> {noreply, State}.
 terminate(_, #state{ conn = C }) -> gcm:stop(C).
 
 code_change(_,State,_) -> {ok, State}.
+
+should_send_to_all() -> true.
